@@ -39,6 +39,7 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
       overflow: hidden;
+      cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='32' height='32'%3E%3Ctext x='0' y='26' font-size='26'%3E🍕%3C/text%3E%3C/svg%3E") 4 4, auto;
     }
     h1 {
       margin: 0;
@@ -57,6 +58,20 @@
     .tr { top: 20px; right: 20px; text-align: right; }
     .bl { bottom: 20px; left: 20px; }
     .br { bottom: 20px; right: 20px; text-align: right; font-weight: 500; }
+    .crumb {
+      position: fixed;
+      pointer-events: none;
+      user-select: none;
+      font-size: 22px;
+      line-height: 1;
+      animation: fall 1.4s cubic-bezier(.4, 0, 1, 1) forwards;
+    }
+    @keyframes fall {
+      to {
+        transform: translate(var(--dx), 70vh) rotate(var(--r));
+        opacity: 0;
+      }
+    }
     @media (prefers-reduced-motion: reduce) {
       h1 { animation: none; }
     }
@@ -68,5 +83,24 @@
   <h1>🍕</h1>
   <p class="corner bl">Still in the oven</p>
   <p class="corner br">Pineapple is<br>a breaking change.</p>
+  <script>
+    if (!matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      let lastX = 0, lastY = 0;
+      addEventListener('pointermove', e => {
+        if (Math.hypot(e.clientX - lastX, e.clientY - lastY) < 40) return;
+        lastX = e.clientX;
+        lastY = e.clientY;
+        const crumb = document.createElement('span');
+        crumb.className = 'crumb';
+        crumb.textContent = '🍕';
+        crumb.style.left = e.clientX - 11 + 'px';
+        crumb.style.top = e.clientY - 11 + 'px';
+        crumb.style.setProperty('--dx', (Math.random() - 0.5) * 120 + 'px');
+        crumb.style.setProperty('--r', (Math.random() - 0.5) * 720 + 'deg');
+        crumb.addEventListener('animationend', () => crumb.remove());
+        document.body.appendChild(crumb);
+      });
+    }
+  </script>
 </body>
 </html>
